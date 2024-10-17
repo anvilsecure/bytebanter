@@ -37,6 +37,7 @@ __all__ = [
     "SelfAskLikertScorer",
     "SelfAskScaleScorer",
     "SelfAskTrueFalseScorer",
+    "SelfAskTrueFalseScorerSimplified",
     "SubStringScorer",
     "TrueFalseInverterScorer",
     "TrueFalseQuestionPaths",
