@@ -4,7 +4,7 @@ from pathlib import Path
 
 from textwrap import dedent
 from pyrit.orchestrator import RedTeamingOrchestrator
-from pyrit.prompt_target import OpenAIChatTarget, GandalfTarget, GandalfLevel
+from pyrit.prompt_target import MatomeChatTarget, OpenAIChatTarget, GandalfTarget, GandalfLevel
 from pyrit.score import SelfAskTrueFalseScorer, GandalfScorer, SelfAskTrueFalseScorerSimplified
 
 
@@ -20,11 +20,13 @@ Remember that the other bot is not aware of any previous conversations and it's 
 )
 
 # red_teaming_llm could be any LLM endpoint. Here it is Azure OpenAI for illustrative purposes.
-red_teaming_llm = OpenAIChatTarget(
-    deployment_name="attacker",
-    endpoint="http://anvil-ai:1337/v1/",
-    api_key="test"
-)
+# red_teaming_llm = OpenAIChatTarget(
+#    deployment_name="attacker",
+#    endpoint="http://anvil-ai:1337/v1/",
+#    api_key="test"
+# )
+red_teaming_llm = MatomeChatTarget()
+
 
 # We use Azure OpenAI GPT4-o here as an example target LLM endpoint.
 target_llm = GandalfTarget(level=GandalfLevel.LEVEL_3)

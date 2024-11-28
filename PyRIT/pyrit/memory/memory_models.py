@@ -178,7 +178,7 @@ class ScoreEntry(Base):  # type: ignore
         self.score_metadata = entry.score_metadata
         self.scorer_class_identifier = entry.scorer_class_identifier
         self.prompt_request_response_id = entry.prompt_request_response_id if entry.prompt_request_response_id else None
-        self.date_time = entry.date_time
+        self.date_time = entry.timestamp
         self.task = entry.task
 
     def get_score(self) -> Score:

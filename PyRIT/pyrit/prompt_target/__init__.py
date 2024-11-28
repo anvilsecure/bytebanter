@@ -1,6 +1,5 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
-
 from pyrit.prompt_target.prompt_target import PromptTarget
 from pyrit.prompt_target.utils import limit_requests_per_minute
 from pyrit.prompt_target.prompt_chat_target.prompt_chat_target import PromptChatTarget
@@ -17,6 +16,7 @@ from pyrit.prompt_target.dall_e_target import DALLETarget
 from pyrit.prompt_target.prompt_chat_target.ollama_chat_target import OllamaChatTarget
 from pyrit.prompt_target.azure_openai_completion_target import AzureOpenAICompletionTarget
 from pyrit.prompt_target.prompt_shield_target import PromptShieldTarget
+from pyrit.prompt_target.prompt_chat_target.matome_chat_target import MatomeChatTarget
 
 
 __all__ = [
@@ -38,4 +38,5 @@ __all__ = [
     "limit_requests_per_minute",
     "TextTarget",
     "OllamaChatTarget",
+    "MatomeChatTarget"
 ]
