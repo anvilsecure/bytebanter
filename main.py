@@ -3,8 +3,8 @@ import asyncio
 from pathlib import Path
 from custom_adapter.matome_chat_target import MatomeChatTarget
 from custom_adapter.self_ask_true_false_scorer_simplified import SelfAskTrueFalseScorerSimplified
-from custom_adapter.AnvilAIChatTarget import AnvilAIChatTarget
-from custom_adapter.AnvilAICompletionTarget import AnvilAICompletionTarget
+from custom_adapter.anvil_ai_chat_target import AnvilAIChatTarget
+from custom_adapter.anvil_ai_completion_target import AnvilAICompletionTarget
 
 from textwrap import dedent
 from pyrit.orchestrator import RedTeamingOrchestrator
