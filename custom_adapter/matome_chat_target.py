@@ -21,10 +21,9 @@ class MatomeChatTarget(OllamaChatTarget):
             model_id: str = "meta.llama3-70b-instruct-v1:0",
             region: str = 'us-east-1',
             chat_message_normalizer: ChatMessageNormalizer = ChatMessageNop(),
-            memory: MemoryInterface = None,
             max_requests_per_minute: Optional[int] = None,
     ):
-        PromptChatTarget.__init__(self, memory=memory, max_requests_per_minute=max_requests_per_minute)
+        PromptChatTarget.__init__(self, max_requests_per_minute=max_requests_per_minute)
         self.model_id = model_id
         self.bedrock_client = boto3.client('bedrock-runtime', region_name=region)
         self.chat_message_normalizer = chat_message_normalizer

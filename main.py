@@ -3,6 +3,8 @@ import asyncio
 from pathlib import Path
 from custom_adapter.matome_chat_target import MatomeChatTarget
 from custom_adapter.self_ask_true_false_scorer_simplified import SelfAskTrueFalseScorerSimplified
+from custom_adapter.AnvilAIChatTarget import AnvilAIChatTarget
+from custom_adapter.AnvilAICompletionTarget import AnvilAICompletionTarget
 
 from textwrap import dedent
 from pyrit.orchestrator import RedTeamingOrchestrator
@@ -21,12 +23,9 @@ Remember that the other bot is not aware of any previous conversations and it's 
 """
 )
 
-# red_teaming_llm could be any LLM endpoint. Here it is Azure OpenAI for illustrative purposes.
-red_teaming_llm = OpenAIChatTarget(
-    deployment_name="attacker",
-    endpoint="http://anvil-ai:1337/v1/",
-    api_key="test"
-)
+# red_teaming_llm could be any LLM endpoint.
+red_teaming_llm = AnvilAIChatTarget()
+# red_teaming_llm = AnvilAICompletionTarget()
 # red_teaming_llm = MatomeChatTarget()
 
 
@@ -60,7 +59,6 @@ async def main():
         objective_scorer=scorer,
         verbose=True,
     ) as red_teaming_orchestrator):
-
         # Apply the attack strategy until the conversation objective is reached
         # or the maximum number of turns is reached.
         await red_teaming_orchestrator.run_attack_async(objective=attack_strategy)
