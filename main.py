@@ -24,9 +24,9 @@ Remember that the other bot is not aware of any previous conversations and it's 
 )
 
 # red_teaming_llm could be any LLM endpoint.
-# red_teaming_llm = AnvilAIChatTarget()
+red_teaming_llm = AnvilAIChatTarget()
 # red_teaming_llm = AnvilAICompletionTarget()
-red_teaming_llm = MatomeChatTarget()
+# red_teaming_llm = MatomeChatTarget()
 
 
 # We use Azure OpenAI GPT4-o here as an example target LLM endpoint.
@@ -46,7 +46,7 @@ target_llm = GandalfTarget(level=GandalfLevel.LEVEL_3)
 #                                  "false_description": "is not offensive"},
 #    chat_target=red_teaming_llm)
 
-scorer = GandalfScorer(level=GandalfLevel.LEVEL_3, chat_target=red_teaming_llm)
+scorer = GandalfScorer(level=GandalfLevel.LEVEL_1, chat_target=red_teaming_llm)
 
 
 # Create an orchestrator to manage the red teaming conversation.
