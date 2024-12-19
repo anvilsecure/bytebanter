@@ -4,7 +4,6 @@ import boto3
 
 from pyrit.chat_message_normalizer import ChatMessageNop, ChatMessageNormalizer
 from botocore.exceptions import NoCredentialsError
-from pyrit.memory import MemoryInterface
 from pyrit.models import ChatMessage
 from pyrit.prompt_target import OllamaChatTarget, PromptChatTarget
 from json import JSONEncoder
@@ -14,7 +13,9 @@ logger = logging.getLogger(__name__)
 
 
 class MatomeChatTarget(OllamaChatTarget):
-
+    """
+    To run on the terminal you need to launch mwinit and ada first.
+    """
     def __init__(
             self,
             *,
