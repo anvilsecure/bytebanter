@@ -1,4 +1,4 @@
 .idea/
 venv/
 !venv/lib/python3.11/site-packages/pyrit/
-.*.pyc
+*.pyc
