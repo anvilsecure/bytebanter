@@ -1,12 +1,13 @@
 from pyrit.prompt_target import PromptTarget
-from pyrit.models import PromptRequestResponse, PromptRequestPiece, Score
+from pyrit.models import PromptRequestResponse, PromptRequestPiece, Score, ScoreType
 from typing import Optional
 from pyrit.score.scorer import Scorer
 
 
 class DummyScorer(Scorer):
     async def score_async(self, request_response: PromptRequestPiece, *, task: Optional[str] = None) -> list[Score]:
-        return [Score()]
+        return [Score(score_value="str", score_value_description="str", score_type=ScoreType(), score_category="str",
+                      score_rationale="str", score_metadata="str", prompt_request_response_id="str")]
 
     def validate(self, request_response: PromptRequestPiece, *, task: Optional[str] = None):
         pass
