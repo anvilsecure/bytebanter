@@ -42,7 +42,7 @@ class AnvilAIModule:
                       "seed": randint(0, 10000), "stream": False, "temperature": 1.0, "top_p": 1.0}
 
 
-class PyRITBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
+class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     _jTabbedPane = JTabbedPane()
     _jPanel = JPanel()
     _jAboutPanel = JPanel()
@@ -73,7 +73,7 @@ class PyRITBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         return "AnvilAI Burp Extension"
 
     def createNewInstance(self, attack):
-        self._GeneratorInstance = PyRITIntruderPayloadGenerator(attack, self._prompt, self._message)
+        self._GeneratorInstance = AnvilAIIntruderPayloadGenerator(attack, self._prompt, self._message)
         return self._GeneratorInstance
 
     def getUiComponent(self):
@@ -135,7 +135,7 @@ class PyRITBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         JOptionPane.showMessageDialog(None, "Anvil AI configured!")
 
 
-class PyRITIntruderPayloadGenerator(IIntruderPayloadGenerator):
+class AnvilAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
     def __init__(self, attack, prompt, question):
         self._attack = attack
         self._prompt = prompt
