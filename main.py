@@ -24,9 +24,9 @@ Remember that the other bot is not aware of any previous conversations and it's 
 )
 
 # red_teaming_llm could be any LLM endpoint.
-red_teaming_llm = AnvilAIChatTarget()
+# red_teaming_llm = AnvilAIChatTarget()
 # red_teaming_llm = AnvilAICompletionTarget()
-# red_teaming_llm = MatomeChatTarget()
+red_teaming_llm = MatomeChatTarget()
 
 
 # We use Azure OpenAI GPT4-o here as an example target LLM endpoint.
