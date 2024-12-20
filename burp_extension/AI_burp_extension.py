@@ -1,9 +1,11 @@
+import json
+import subprocess
+
 from burp import IBurpExtender, IIntruderPayloadGenerator, IIntruderPayloadGeneratorFactory, ITab
 from javax.swing import JLabel, JTextField, JOptionPane, JTabbedPane, JPanel, JButton
 from java.awt import GridBagLayout, GridBagConstraints
-import json
-import subprocess
 from random import randint
+
 
 class Requests:
     @staticmethod
