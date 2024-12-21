@@ -2,8 +2,9 @@ import json
 import subprocess
 
 from burp import IBurpExtender, IIntruderPayloadGenerator, IIntruderPayloadGeneratorFactory, ITab
-from javax.swing import JLabel, JTextField, JOptionPane, JTabbedPane, JPanel, JButton
+from javax.swing import JLabel, JTextField, JOptionPane, JTabbedPane, JPanel, JButton, JTextArea
 from java.awt import GridBagLayout, GridBagConstraints
+from java.io import PrintWriter
 from random import randint
 
 
@@ -42,7 +43,7 @@ class AnvilAIModule:
                       "seed": randint(0, 10000), "stream": False, "temperature": 1.0, "top_p": 1.0}
 
 
-class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
+class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     _jTabbedPane = JTabbedPane()
     _jPanel = JPanel()
     _jAboutPanel = JPanel()
@@ -57,6 +58,8 @@ class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab)
     aboutText = "A Burp extension to interact with AnvilAI and use it as payload generator"
     _prompt = "You are a fuzzer that's being used during a penetration to validate the security of a web application."
     _message = "Generate an XSS payload, the message should only contain the payload"
+    stdout = None
+    stderr = None
 
     def registerExtenderCallbacks(self, callbacks):
         self._callbacks = callbacks
@@ -67,13 +70,17 @@ class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab)
         self.initPanelConfig()
         self._jTabbedPane.addTab("Configuration", self._jPanel)
         self._jTabbedPane.addTab("About", self._jAboutPanel)
+        self.stdout = PrintWriter(callbacks.getStdout(), True)
+        self.stderr = PrintWriter(callbacks.getStderr(), True)
+        self._GeneratorInstance = AnvilAIIntruderPayloadGenerator(self._prompt, self._message)
         return
 
     def getGeneratorName(self):
         return "AnvilAI Burp Extension"
 
     def createNewInstance(self, attack):
-        self._GeneratorInstance = AnvilAIIntruderPayloadGenerator(attack, self._prompt, self._message)
+        self.stdout.println("Create New Instance")
+        self._GeneratorInstance = AnvilAIIntruderPayloadGenerator(self._prompt, self._message)
         return self._GeneratorInstance
 
     def getUiComponent(self):
@@ -95,7 +102,7 @@ class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab)
         self._jPanelConstraints.gridy = 0
         self._jPanel.add(self._jLabelPrompt, self._jPanelConstraints)
 
-        self._jTextFieldPrompt = JTextField(self._prompt, 15)
+        self._jTextFieldPrompt = JTextArea(text=self._prompt, columns=15, rows=20)
         self._jPanelConstraints.fill = GridBagConstraints.HORIZONTAL
         self._jPanelConstraints.gridx = 1
         self._jPanelConstraints.gridy = 0
@@ -120,13 +127,13 @@ class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab)
         self._jPanelConstraints.gridwidth = 2
         self._jPanel.add(self._jButtonSave, self._jPanelConstraints)
 
-        self._jLabelAbout = JLabel("<html><body>%s</body></html>" % self.aboutText)
+        self._jLabelAbout = JLabel(self.aboutText)
         self._jPanelConstraints.fill = GridBagConstraints.HORIZONTAL
         self._jPanelConstraints.gridx = 0
         self._jPanelConstraints.gridy = 0
         self._jAboutPanel.add(self._jLabelAbout, self._jPanelConstraints)
 
-    def setAI(self):
+    def setAI(self, event=None):
         self._prompt = self._jTextFieldPrompt.getText()
         self._message = self._jTextFieldMessage.getText()
         self._GeneratorInstance.set_prompt(self._prompt)
@@ -136,8 +143,7 @@ class AnvilAIBurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab)
 
 
 class AnvilAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
-    def __init__(self, attack, prompt, question):
-        self._attack = attack
+    def __init__(self, prompt, question):
         self._prompt = prompt
         self._anvilAIModule = AnvilAIModule(prompt=prompt)
         self._question = question
