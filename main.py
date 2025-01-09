@@ -32,7 +32,7 @@ red_teaming_llm = AnvilAIChatTarget()
 
 
 # We use Azure OpenAI GPT4-o here as an example target LLM endpoint.
-target_llm = GandalfTarget(level=GandalfLevel.LEVEL_1, max_requests_per_minute=5)
+target_llm = GandalfTarget(level=GandalfLevel.LEVEL_2, max_requests_per_minute=5)
 
 # Scorer with Matome
 # scorer = SelfAskTrueFalseScorer(
