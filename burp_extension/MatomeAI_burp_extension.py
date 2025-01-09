@@ -142,7 +142,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         return self._jTabbedPane
 
     def getTabCaption(self):
-        return "AnvilAI"
+        return "MatomeAI"
 
     def initPanelConfig(self):
         self._jPanel.setBounds(0, 0, 1000, 1000)
@@ -273,13 +273,13 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._GeneratorInstance.set_temp(self._temp)
         self._GeneratorInstance.set_tp(self._tp)
         self._GeneratorInstance.reset()
-        JOptionPane.showMessageDialog(None, "Anvil AI configured!")
+        JOptionPane.showMessageDialog(None, "Matome AI configured!")
 
 
 class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
     def __init__(self, prompt, question, model, mt, temp, tp):
         self._prompt = prompt
-        self._anvilAIModule = MatomeAIModule(prompt=prompt, model=model)
+        self._matomeAIModule = MatomeAIModule(prompt=prompt, model=model)
         self._question = question
         self._model = model
         self._mt = mt
@@ -311,7 +311,7 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._temp = tp
 
     def getNextPayload(self, baseValue):
-        payload = self._anvilAIModule.ask_ai()
+        payload = self._matomeAIModule.ask_ai()
         return payload
 
     def hasMorePayloads(self):
@@ -319,4 +319,4 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
 
     def reset(self):
         print("-------------------------reset----------------------")
-        return self._anvilAIModule.reset(self._prompt, self._question, self._model, self._mt, self._temp, self._tp)
+        return self._matomeAIModule.reset(self._prompt, self._question, self._model, self._mt, self._temp, self._tp)
