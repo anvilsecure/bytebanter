@@ -125,8 +125,8 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._jTabbedPane.addTab("About", self._jAboutPanel)
         self.stdout = PrintWriter(callbacks.getStdout(), True)
         self.stderr = PrintWriter(callbacks.getStderr(), True)
-        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._fp,
-                                                                  self._mt, self._pp, self._temp, self._tp)
+        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
+                                                                   self._temp, self._tp)
         return
 
     def getGeneratorName(self):
@@ -134,8 +134,8 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
 
     def createNewInstance(self, attack):
         self.stdout.println("Create New Instance")
-        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._fp,
-                                                                  self._mt, self._pp, self._temp, self._tp)
+        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
+                                                                   self._temp, self._tp)
         return self._GeneratorInstance
 
     def getUiComponent(self):
