@@ -17,7 +17,7 @@ class Requests:
         which = subprocess.Popen(["which", "aws"], stdout=subprocess.PIPE)
         which.wait()
         aws_path = which.stdout.read().strip()
-        aws = subprocess.Popen(["/opt/homebrew/bin/aws", "bedrock", "--model-id", data["model"], "--messages",
+        aws = subprocess.Popen([aws_path, "bedrock", "--model-id", data["model"], "--messages",
                                  json.dumps(data["messages"]), "--region", "us-east-1", "--inference-config",
                                  json.dumps(data["inference-config"])],
                                 stdout=subprocess.PIPE)
