@@ -6,7 +6,6 @@ from javax.swing import (JLabel, JTextField, JOptionPane, JTabbedPane, JPanel, J
                          JSeparator, JSpinner, SpinnerNumberModel)
 from java.awt import GridBagLayout, GridBagConstraints
 from java.io import PrintWriter
-from random import randint
 
 
 class Requests:
@@ -16,11 +15,12 @@ class Requests:
         print(data)
         which = subprocess.Popen(["which", "aws"], stdout=subprocess.PIPE)
         which.wait()
-        aws_path = which.stdout.read().strip()
-        aws = subprocess.Popen([aws_path, "bedrock", "--model-id", data["model"], "--messages",
+        aws_path = which.stdout.read().strip().decode('ascii')
+        print(aws_path)
+        aws = subprocess.Popen(["/opt/homebrew/bin/aws", "bedrock-runtime", "converse", "--model-id", data["model"], "--messages",
                                  json.dumps(data["messages"]), "--region", "us-east-1", "--inference-config",
                                  json.dumps(data["inference-config"])],
-                                stdout=subprocess.PIPE)
+                                 stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         aws.wait()
         print("-----------------------------")
         print("---------- MESSAGE ----------")
@@ -36,20 +36,20 @@ class MatomeAIModule:
     def __init__(self, prompt, first_message="generate the payload", model="meta.llama3-70b-instruct-v1:0", mt=50,
                  temp=1.0, tp=1.0):
         self._data = {"model": model,
-                      "messages": [{"role": "system", "content": prompt},
-                                   {"role": "user", "content": first_message}],
+                      "messages": [{"role": "user",
+                                    "content": [{"text": "{0} \n {1}".format(prompt, first_message)}]}],
                       "inference-config": {"maxTokens": mt, "temperature": temp, "topP": tp}}
 
     def ask_ai(self):
         r = Requests.ask(data=self._data)
-        message = r["choices"][0]["message"]
-        return message["content"]
+        message = r["output"]["message"]
+        return message["content"][0]["text"]
 
     def reset(self, prompt, first_message="generate the payload", model="meta.llama3-70b-instruct-v1:0", mt=50,
               temp=1.0, tp=1.0):
         self._data = {"model": model,
-                      "messages": [{"role": "system", "content": prompt},
-                                   {"role": "user", "content": first_message}],
+                      "messages": [{"role": "user",
+                                    "content": [{"text": "{0} \n {1}".format(prompt, first_message)}]}],
                       "inference-config": {"maxTokens": mt, "temperature": temp, "topP": tp}}
 
 
@@ -289,11 +289,11 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._tp = tp
 
     def set_prompt(self, prompt):
-        print("prompt: {}".format(prompt))
+        # print("prompt: {}".format(prompt))
         self._prompt = prompt
 
     def set_question(self, question):
-        print("question: {}".format(question))
+        # print("question: {}".format(question))
         self._question = question
 
     def set_model(self, model):
@@ -313,6 +313,7 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._temp = tp
 
     def getNextPayload(self, baseValue):
+        print("base_value: {}".format(baseValue))
         payload = self._matomeAIModule.ask_ai()
         return payload
 
