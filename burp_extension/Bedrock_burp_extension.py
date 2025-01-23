@@ -289,11 +289,11 @@ class BedrockIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._tp = tp
 
     def set_prompt(self, prompt):
-        # print("prompt: {}".format(prompt))
+        print("prompt: {}".format(prompt))
         self._prompt = prompt
 
     def set_question(self, question):
-        # print("question: {}".format(question))
+        print("question: {}".format(question))
         self._question = question
 
     def set_model(self, model):
