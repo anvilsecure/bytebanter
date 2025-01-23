@@ -32,7 +32,7 @@ class Requests:
         return message
 
 
-class MatomeAIModule:
+class BedrockModule:
     def __init__(self, prompt, first_message="generate the payload", model="meta.llama3-70b-instruct-v1:0", mt=50,
                  temp=1.0, tp=1.0):
         self._data = {"model": model,
@@ -73,7 +73,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     _jLabelAbout = None
     _GeneratorInstance = None
     _jComboBoxModel = None
-    aboutText = ("A Burp extension to interact with Matome AWS AI and use it as payload generator\n"
+    aboutText = ("A Burp extension to interact with AWS Bedrock AI and use it as payload generator\n"
                  "When using this generator please use a single threaded resource pool in the burp intruder.")
     _prompt = ("# Instructions\n"
                "- Consider the scenario where an Attacker AI is discussing with a Defender AI.\n"
@@ -119,7 +119,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     def registerExtenderCallbacks(self, callbacks):
         self._callbacks = callbacks
         self._helpers = callbacks.getHelpers()
-        callbacks.setExtensionName("Matome AI Burp Extension")
+        callbacks.setExtensionName("AWS Bedrock Burp Extension")
         callbacks.registerIntruderPayloadGeneratorFactory(self)
         callbacks.addSuiteTab(self)
         self.initPanelConfig()
@@ -127,24 +127,24 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._jTabbedPane.addTab("About", self._jAboutPanel)
         self.stdout = PrintWriter(callbacks.getStdout(), True)
         self.stderr = PrintWriter(callbacks.getStderr(), True)
-        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
-                                                                   self._temp, self._tp)
+        self._GeneratorInstance = BedrockIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
+                                                                  self._temp, self._tp)
         return
 
     def getGeneratorName(self):
-        return "MatomeAI Burp Extension"
+        return "BedrockAI Burp Extension"
 
     def createNewInstance(self, attack):
         self.stdout.println("Create New Instance")
-        self._GeneratorInstance = MatomeAIIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
-                                                                   self._temp, self._tp)
+        self._GeneratorInstance = BedrockIntruderPayloadGenerator(self._prompt, self._message, self._model, self._mt,
+                                                                  self._temp, self._tp)
         return self._GeneratorInstance
 
     def getUiComponent(self):
         return self._jTabbedPane
 
     def getTabCaption(self):
-        return "MatomeAI"
+        return "BedrockAI"
 
     def initPanelConfig(self):
         self._jPanel.setBounds(0, 0, 1000, 1000)
@@ -275,13 +275,13 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._GeneratorInstance.set_temp(self._temp)
         self._GeneratorInstance.set_tp(self._tp)
         self._GeneratorInstance.reset()
-        JOptionPane.showMessageDialog(None, "Matome AI configured!")
+        JOptionPane.showMessageDialog(None, "Bedrock AI configured!")
 
 
-class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
+class BedrockIntruderPayloadGenerator(IIntruderPayloadGenerator):
     def __init__(self, prompt, question, model, mt, temp, tp):
         self._prompt = prompt
-        self._matomeAIModule = MatomeAIModule(prompt=prompt, model=model)
+        self._bedrockAIModule = BedrockModule(prompt=prompt, model=model)
         self._question = question
         self._model = model
         self._mt = mt
@@ -314,7 +314,7 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
 
     def getNextPayload(self, baseValue):
         print("base_value: {}".format(baseValue))
-        payload = self._matomeAIModule.ask_ai()
+        payload = self._bedrockAIModule.ask_ai()
         return payload
 
     def hasMorePayloads(self):
@@ -322,4 +322,4 @@ class MatomeAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
 
     def reset(self):
         print("-------------------------reset----------------------")
-        return self._matomeAIModule.reset(self._prompt, self._question, self._model, self._mt, self._temp, self._tp)
+        return self._bedrockAIModule.reset(self._prompt, self._question, self._model, self._mt, self._temp, self._tp)
