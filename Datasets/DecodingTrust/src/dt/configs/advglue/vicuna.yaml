@@ -1,0 +1,9 @@
+sys: false
+demo: true
+data_file: vicuna
+out_file: ./results/adv-glue-plus-plus/${model_config.model}/vicuna-demo.json
+no_adv: false
+resume: false
+save_interval: 100
+remove_newline: false
+task: ["sst2", "qqp", "mnli"]
