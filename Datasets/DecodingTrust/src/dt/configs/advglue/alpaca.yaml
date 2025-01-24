@@ -1,9 +1,0 @@
-sys: false
-demo: true
-data_file: alpaca
-out_file: ./results/adv-glue-plus-plus/${model_config.model}/alpaca-demo.json
-no_adv: false
-resume: false
-save_interval: 100
-remove_newline: false
-task: ["sst2", "qqp", "mnli"]

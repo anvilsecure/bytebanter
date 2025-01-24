@@ -1,8 +1,0 @@
-data_file: ./data/ood/knowledge.json
-out_file: ./results/ood/results/${model_config.model}/knowledge_2020_5shot.json
-result_file: ./results/ood/results/${model_config.model}/final_scores.json
-few_shot_num: 5
-task: knowledge
-idk: False
-resume: False
-save_interval: 100
