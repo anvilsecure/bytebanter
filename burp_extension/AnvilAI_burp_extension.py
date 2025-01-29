@@ -24,6 +24,13 @@ class Requests:
         print("-----------------------------")
         return message
 
+    @staticmethod
+    def get(url):
+        curl = subprocess.Popen(["/usr/bin/curl", url], stdout=subprocess.PIPE)
+        curl.wait()
+        message = json.loads(curl.stdout.read().replace("\n", "").replace("\r", ""))
+        return message
+
 
 class AnvilAIModule:
     def __init__(self, prompt, first_message="generate the payload", model="GPTQ-for-LLaMa", fp=1.0, mt=50, pp=0.0,
