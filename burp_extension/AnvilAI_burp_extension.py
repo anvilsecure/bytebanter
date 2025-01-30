@@ -1,7 +1,9 @@
 import json
 import subprocess
+import re
 
-from burp import IBurpExtender, IIntruderPayloadGenerator, IIntruderPayloadGeneratorFactory, ITab
+from burp import (IBurpExtender, IIntruderPayloadGenerator, IIntruderPayloadGeneratorFactory, ITab, IHttpListener,
+                  IBurpExtenderCallbacks)
 from javax.swing import (JLabel, JTextField, JOptionPane, JTabbedPane, JPanel, JButton, JTextArea, JComboBox, JSlider,
                          JSeparator, JSpinner, SpinnerNumberModel)
 from java.awt import GridBagLayout, GridBagConstraints
@@ -40,10 +42,21 @@ class AnvilAIModule:
                       "frequency_penalty": fp, "max_tokens": mt, "presence_penalty": pp,
                       "seed": randint(0, 10000), "stream": False, "temperature": temp, "top_p": tp}
 
-    def ask_ai(self):
+    def ask_ai(self, m=None):
+        # append the message returned by the target
+        messages = self._data["messages"]
+        if m:
+            messages.append({"role": "user", "content": m})
+            self._data["messages"] = messages
+
+        # interrogate our AI
         r = Requests.post("http://anvil-ai:1337/v1/chat/completions", data=json.dumps(self._data))
-        message = r["choices"][0]["message"]
-        return message["content"]
+        message = r["choices"][0]["message"]["content"]
+
+        # Append the response to the communication data stack
+        messages.append({"role": "assistant", "content": message})
+        self._data["messages"] = messages
+        return message
 
     def reset(self, prompt, first_message="generate the payload", fp=1.0, mt=50, pp=0.0,
               temp=1.0, tp=1.0):
@@ -53,7 +66,7 @@ class AnvilAIModule:
                       "seed": randint(0, 10000), "stream": False, "temperature": temp, "top_p": tp}
 
 
-class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
+class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab, IHttpListener):
     _jTabbedPane = JTabbedPane()
     _jPanel = JPanel()
     _jAboutPanel = JPanel()
@@ -116,6 +129,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
     _pp = 0.0
     _temp = 1.0
     _tp = 1.0
+    _response_regex = re.compile(r"^{.*\"answer\":\"(.*)\",\"defender\".*}$")
     stdout = None
     stderr = None
 
@@ -124,6 +138,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._helpers = callbacks.getHelpers()
         callbacks.setExtensionName("AnvilAI Burp Extension")
         callbacks.registerIntruderPayloadGeneratorFactory(self)
+        callbacks.registerHttpListener(self)
         callbacks.addSuiteTab(self)
         self.initPanelConfig()
         self._jTabbedPane.addTab("Configuration", self._jPanel)
@@ -133,6 +148,17 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._GeneratorInstance = AnvilAIIntruderPayloadGenerator(self._prompt, self._message, self._fp,
                                                                   self._mt, self._pp, self._temp, self._tp)
         return
+
+    def processHttpMessage(self, toolFlag, messageIsRequest, messageInfo):
+        if messageIsRequest or toolFlag != IBurpExtenderCallbacks.TOOL_INTRUDER:
+            return
+        response = messageInfo.getResponse()
+        responseInfo = self._helpers.analyzeResponse(response)
+        body = ''.join(chr(x) for x in response[responseInfo.getBodyOffset():])
+        rxp = re.search(self._response_regex, body)
+        if rxp:
+            self._GeneratorInstance.push_to_message_queque(rxp.group(1))
+
 
     def getGeneratorName(self):
         return "AnvilAI Burp Extension"
@@ -305,6 +331,10 @@ class AnvilAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._pp = pp
         self._temp = temp
         self._tp = tp
+        self._message_queque = []
+
+    def push_to_message_queque(self, m):
+        self._message_queque.append(m)
 
     def set_prompt(self, prompt):
         print("prompt: {}".format(prompt))
@@ -335,7 +365,10 @@ class AnvilAIIntruderPayloadGenerator(IIntruderPayloadGenerator):
         self._temp = tp
 
     def getNextPayload(self, baseValue):
-        payload = self._anvilAIModule.ask_ai()
+        m = None
+        if len(self._message_queque):
+            m = self._message_queque.pop()
+        payload = self._anvilAIModule.ask_ai(m)
         return payload
 
     def hasMorePayloads(self):
