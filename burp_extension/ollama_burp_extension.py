@@ -142,7 +142,7 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         callbacks.registerIntruderPayloadGeneratorFactory(self)
         callbacks.addSuiteTab(self)
         self.initPanelConfig()
-        self._jTabbedPane.addTab("Endpoint", self._jURLPanel)
+        self._jTabbedPane.addTab("LLM Endpoint", self._jURLPanel)
         self._jTabbedPane.addTab("Configuration", self._jPanel)
         self._jTabbedPane.addTab("About", self._jAboutPanel)
         self.stdout = PrintWriter(callbacks.getStdout(), True)
@@ -186,11 +186,11 @@ class BurpExtender(IBurpExtender, IIntruderPayloadGeneratorFactory, ITab):
         self._jPanelConstraints.gridy = 3
         self._jURLPanel.add(self._jTextURL, self._jPanelConstraints)
 
-        self._jButtonSave = JButton('Save', actionPerformed=self.setURL)
+        self._jURLButton = JButton('Save', actionPerformed=self.setURL)
         self._jPanelConstraints.gridx = 0
         self._jPanelConstraints.gridy = 7
         self._jPanelConstraints.gridwidth = 3
-        self._jURLPanel.add(self._jButtonSave, self._jPanelConstraints)
+        self._jURLPanel.add(self._jURLButton, self._jPanelConstraints)
 
         jPromptPanel = JPanel()
         jPromptPanel.setBounds(0, 0, 1000, 500)
