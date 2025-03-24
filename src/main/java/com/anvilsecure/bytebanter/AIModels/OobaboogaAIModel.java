@@ -53,7 +53,7 @@ public class OobaboogaAIModel extends AIModel {
         data.put("stream", false);
         data.put("seed", new Random().nextInt() % 10000);
 
-        JSONObject response = super.sendPostRequest(params.get("URL") + "chat/completions", data.toString());
+        JSONObject response = super.sendPostRequest(params.get("URL") + "chat/completions", data.toString(), params.getString("headers"));
         String responseMessage = response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
 
         messages.put(new JSONObject().put("role", "assistant").put("content", responseMessage));
