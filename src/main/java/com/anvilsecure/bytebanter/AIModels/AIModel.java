@@ -13,6 +13,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -30,13 +31,47 @@ public abstract class AIModel implements HttpHandler {
         this.name = name;
     }
 
-    abstract public String askAi();
     abstract public String askAi(String prompt, String user_input);
-    abstract public AIModelUI getUI();
+    public AIModelUI getUI(){
+        return UI;
+    };
 
      public String getName(){
          return name;
      };
+
+        public String askAi() {
+        JSONObject params = UI.getParams();
+        JSONObject data = new JSONObject();
+
+        // reset messages on "stateful" change
+        messages = isStateful != params.getBoolean("stateful") ? new JSONArray() : messages;
+        isStateful = params.getBoolean("stateful");
+
+        if(messages.isEmpty()) {
+            messages.put(new JSONObject().put("role", "system").put("content", params.getString("prompt")));
+        }
+
+        if(!isStateful) {
+            messages.put(new JSONObject().put("role", "user").put("content", DEFAULT_MESSAGE));
+        }
+        data.put("messages", messages);
+        String responseMessage = sendRequestToAI(data, params);
+        messages.put(new JSONObject().put("role", "assistant").put("content", responseMessage));
+        return responseMessage;
+    }
+
+     protected String sendRequestToAI(JSONObject data, JSONObject params) {
+        data.put("frequency_penalty", params.getDouble("frequency_penalty"));
+        data.put("max_tokens", params.getInt("max_tokens"));
+        data.put("presence_penalty", params.getDouble("presence_penalty"));
+        data.put("temperature", params.getDouble("temperature"));
+        data.put("top_p", params.getDouble("top_p"));
+        data.put("stream", false);
+        data.put("seed", new Random().nextInt() % 10000);
+        JSONObject response = sendPostRequest(params.get("URL") + "chat/completions", data.toString(), params.getString("headers"));
+        return response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
+    }
 
      JSONObject sendPostRequest(String urlString, String payload, String headers) {
         HttpRequest request = HttpRequest.httpRequestFromUrl(urlString);
