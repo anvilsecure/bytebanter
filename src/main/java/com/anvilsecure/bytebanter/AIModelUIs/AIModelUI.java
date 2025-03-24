@@ -23,7 +23,7 @@ public abstract class AIModelUI {
     public JPanel getStatePanel(){
         JPanel statePanel = new JPanel(new GridLayout(3, 1));
         statefulCheck = new JCheckBox("Stateful Interaction", false);
-        regexField = new JTextField(".*'([^']*)'");
+        regexField = new JTextField("^\\{.*\\\"answer\\\":\\\"(.*)\\\",\\\"defender\\\".*\\}$");
         b64Check = new JCheckBox("Base64 decoding", false);
         statePanel.add(statefulCheck);
         statePanel.add(regexField);

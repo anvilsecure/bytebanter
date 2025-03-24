@@ -9,7 +9,12 @@ import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
 import com.anvilsecure.bytebanter.AIModelUIs.OobaboogaAIModelUI;
 import org.json.*;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Base64;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OobaboogaAIModel extends AIModel {
     private static final String DEFAULT_MESSAGE = "Generate a new payload";
@@ -24,7 +29,7 @@ public class OobaboogaAIModel extends AIModel {
     }
 
     @Override
-    public String askAi() throws IOException {
+    public String askAi() {
         JSONObject params = UI.getParams();
         JSONObject data = new JSONObject();
 
@@ -70,8 +75,15 @@ public class OobaboogaAIModel extends AIModel {
     public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived httpResponseReceived) {
         JSONObject params = UI.getParams();
         if (isStateful) {
-            super.api.logging().logToOutput("got a response!");
-            //TODO: add here logic to parse target responses
+            Matcher matcher = Pattern.compile(params.getString("regex")).matcher(httpResponseReceived.bodyToString());
+            if (matcher.find()) {
+                String rxp = params.getBoolean("b64") ?
+                        Arrays.toString(Base64.getDecoder().decode(matcher.group(1))) : matcher.group(1);
+                api.logging().logToOutput("------------------------********** Target Response: **********-------------");
+                api.logging().logToOutput(rxp);
+                api.logging().logToOutput("-----------------------------------------------------------------------");
+                messages.put(new JSONObject().put("role", "user").put("content", rxp));
+            }
         }
         return ResponseReceivedAction.continueWith(httpResponseReceived);
     }

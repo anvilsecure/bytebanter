@@ -20,7 +20,7 @@ public class OobaboogaAIModelUI extends AIModelUI {
     public JPanel getURLPanel() {
         JPanel configPanel = new JPanel(new GridBagLayout());
         configPanel.setBorder(new TitledBorder("Model URL:"));
-        urlField = new JTextField("http://localhost:5000/v1/", 40);
+        urlField = new JTextField("http://anvil-ai:1337/v1/", 40);
         urlField.setBorder(new TitledBorder("URL:"));
         configPanel.add(urlField, new GridBagConstraints(0, 0, 2, 1, 0.001, 0.001,
                 GridBagConstraints.CENTER, GridBagConstraints.HORIZONTAL, new Insets(0, 0, 0, 0), 0, 0));

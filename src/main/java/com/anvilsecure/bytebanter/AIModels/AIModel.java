@@ -31,10 +31,12 @@ public abstract class AIModel implements HttpHandler {
         request = request.withMethod("POST");
         request = request.withAddedHeader("Content-Type", "application/json");
         request = request.withBody(payload);
-        api.logging().logToOutput(payload);
+        // api.logging().logToOutput(payload);
         HttpRequest finalRequest = request;
         HttpRequestResponse response = api.http().sendRequest(finalRequest);
+        api.logging().logToOutput("---------------------------- Attacker Response: -------------------------------");
         api.logging().logToOutput(response.response().bodyToString());
+        api.logging().logToOutput("-------------------------------------------------------------------------------");
         return new JSONObject(response.response().bodyToString());
     }
 
