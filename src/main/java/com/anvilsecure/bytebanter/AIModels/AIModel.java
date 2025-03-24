@@ -20,7 +20,8 @@ public abstract class AIModel implements HttpHandler {
         this.name = name;
     }
 
-    abstract public String askAi() throws IOException;
+    abstract public String askAi();
+    abstract public String askAi(String prompt, String user_input);
     abstract public AIModelUI getUI();
 
      public String getName(){
@@ -30,11 +31,13 @@ public abstract class AIModel implements HttpHandler {
      JSONObject sendPostRequest(String urlString, String payload, String headers) {
         HttpRequest request = HttpRequest.httpRequestFromUrl(urlString);
         request = request.withMethod("POST");
-        HttpHeader httpHeader = HttpHeader.httpHeader(headers);
-        request = request.withAddedHeader(httpHeader);
+        if (!headers.isEmpty()) {
+            HttpHeader httpHeader = HttpHeader.httpHeader(headers);
+            request = request.withAddedHeader(httpHeader);
+        }
         request = request.withAddedHeader("Content-Type", "application/json");
         request = request.withBody(payload);
-        // api.logging().logToOutput(request.toString());
+        api.logging().logToOutput(request.toString());
         HttpRequest finalRequest = request;
         HttpRequestResponse response = api.http().sendRequest(finalRequest);
         api.logging().logToOutput("---------------------------- Attacker Response: -------------------------------");

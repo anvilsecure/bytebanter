@@ -40,12 +40,6 @@ public class ByteBanterPayloadGenerator implements PayloadGenerator {
 
     @Override
     public GeneratedPayload generatePayloadFor(IntruderInsertionPoint intruderInsertionPoint) {
-        try {
             return GeneratedPayload.payload(model.askAi());
-        }catch (IOException e){
-            api.logging().logToError("Error generating payload", e);
-            return GeneratedPayload.end();
-        }
-
     }
 }

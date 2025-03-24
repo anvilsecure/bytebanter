@@ -7,10 +7,13 @@ import burp.api.montoya.intruder.AttackConfiguration;
 import burp.api.montoya.intruder.PayloadGenerator;
 import burp.api.montoya.intruder.PayloadGeneratorProvider;
 import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
+import com.anvilsecure.bytebanter.AIModels.AIModel;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.URL;
@@ -126,10 +129,19 @@ public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadin
 
         // Prompt panel
         promptPanel = payloadGenerator.getModel().getUI().getPromptPanel(default_prompt);
+        // Optimize button is stadard in all the model
+        JButton optimizeButton = new JButton("Optimize!");
+        URL sparklerURL = AIModelUI.class.getResource("/sparkler.png");
+        Image sparkler = new ImageIcon(sparklerURL).getImage().getScaledInstance(20,20,Image.SCALE_SMOOTH);
+        optimizeButton.setIcon(new ImageIcon(sparkler));
+        optimizeButton.addActionListener(e -> optimizePrompt());
+        promptPanel.add(optimizeButton, new GridBagConstraints(0, 1, 1, 1, 1.0,
+                1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
+                new Insets(0, 0, 0, 0), 0, 0));
         mainPanel.add(configPanel);
         drawPanels();
         panel.add(titlePanel, BorderLayout.NORTH);
-        panel.add(mainPanel, BorderLayout.CENTER);
+        panel.add(new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
         return panel;
     }
 
@@ -184,5 +196,16 @@ public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadin
     public void extensionUnloaded() {
         // TODO: implement unloader and settings
     }
+
+
+    private void optimizePrompt(){
+        AIModel model = payloadGenerator.getModel();
+        AIModelUI ui = payloadGenerator.getModel().getUI();
+        JTextArea promptField = ui.getPromptField();
+        new Thread(() -> promptField.setText(model.askAi("Optimize this prompt following prompt engineering best practices. " +
+                        "return only the new prompt! Use the second person in the new prompt.",
+                promptField.getText()))).start();
+    }
+
 }
 

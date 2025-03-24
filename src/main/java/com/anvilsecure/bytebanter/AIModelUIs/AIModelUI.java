@@ -5,6 +5,9 @@ import org.json.JSONObject;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.URL;
 
 public abstract class AIModelUI {
     private JCheckBox statefulCheck;
@@ -15,8 +18,12 @@ public abstract class AIModelUI {
     public JPanel getPromptPanel(String default_prompt){
         JPanel promptPanel = new JPanel(new GridBagLayout());
         promptPanel.setBorder(new TitledBorder("Prompt:"));
-        promptField = new JTextArea(default_prompt);
-        promptPanel.add(promptField);
+        promptField = new JTextArea(default_prompt, 50, 50);
+        promptField.setMinimumSize(new Dimension(50,50));
+        JScrollPane promptScrollPane = new JScrollPane(promptField, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        promptField.setLineWrap(true);
+        promptScrollPane.setMinimumSize(new Dimension(50,50));
+        promptPanel.add(promptScrollPane, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
         return promptPanel;
     }
 
@@ -39,6 +46,10 @@ public abstract class AIModelUI {
         params.put("regex", regexField.getText());
         params.put("b64", b64Check.isSelected());
         return params;
+    }
+
+    public JTextArea getPromptField() {
+        return promptField;
     }
 
     public abstract JPanel getURLPanel();
