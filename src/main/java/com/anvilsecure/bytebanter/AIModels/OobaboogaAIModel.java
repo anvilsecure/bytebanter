@@ -9,21 +9,18 @@ import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
 import com.anvilsecure.bytebanter.AIModelUIs.OobaboogaAIModelUI;
 import org.json.*;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Random;
 
-public class OobaboogaAIModel implements AIModel {
+public class OobaboogaAIModel extends AIModel {
     private static final String DEFAULT_MESSAGE = "Generate a new payload";
     private final OobaboogaAIModelUI UI;
     private JSONArray messages;
     private Boolean isStateful = false;
-    private final MontoyaApi api;
 
     public OobaboogaAIModel(MontoyaApi api) {
+        super(api, "Oobabooga");
         UI = new OobaboogaAIModelUI();
         messages = new JSONArray();
-        this.api = api;
     }
 
     @Override
@@ -51,7 +48,7 @@ public class OobaboogaAIModel implements AIModel {
         data.put("stream", false);
         data.put("seed", new Random().nextInt() % 10000);
 
-        JSONObject response = sendPostRequest(params.get("URL") + "chat/completions", data.toString());
+        JSONObject response = super.sendPostRequest(params.get("URL") + "chat/completions", data.toString());
         String responseMessage = response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
 
         messages.put(new JSONObject().put("role", "assistant").put("content", responseMessage));
@@ -60,39 +57,9 @@ public class OobaboogaAIModel implements AIModel {
     }
 
     @Override
-    public String getName(){
-        return "Oobabooga";
-    }
-
-    @Override
     public AIModelUI getUI(){
         return UI;
     }
-
-    private JSONObject sendPostRequest(String urlString, String payload) throws IOException {
-        URL url = new URL(urlString);
-        api.logging().logToOutput(payload);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod("POST");
-        conn.setRequestProperty("Content-Type", "application/json");
-        conn.setDoOutput(true);
-
-        try (OutputStream os = conn.getOutputStream()) {
-            byte[] input = payload.getBytes("utf-8");
-            os.write(input, 0, input.length);
-        }
-
-        StringBuilder response = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
-            String responseLine;
-            while ((responseLine = br.readLine()) != null) {
-                response.append(responseLine.trim());
-            }
-        }
-
-        return new JSONObject(response.toString());
-    }
-
 
     @Override
     public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent httpRequestToBeSent) {
@@ -103,7 +70,7 @@ public class OobaboogaAIModel implements AIModel {
     public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived httpResponseReceived) {
         JSONObject params = UI.getParams();
         if (isStateful) {
-            api.logging().logToOutput("got a response!");
+            super.api.logging().logToOutput("got a response!");
             //TODO: add here logic to parse target responses
         }
         return ResponseReceivedAction.continueWith(httpResponseReceived);

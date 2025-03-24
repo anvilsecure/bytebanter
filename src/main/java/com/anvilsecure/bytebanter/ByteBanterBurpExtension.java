@@ -2,24 +2,24 @@ package com.anvilsecure.bytebanter;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.BurpExtension;
+import burp.api.montoya.extension.ExtensionUnloadingHandler;
 import burp.api.montoya.intruder.AttackConfiguration;
 import burp.api.montoya.intruder.PayloadGenerator;
 import burp.api.montoya.intruder.PayloadGeneratorProvider;
 import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 
-public class ByteBanterBurpExtension implements BurpExtension, PayloadGeneratorProvider {
+public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadingHandler, PayloadGeneratorProvider {
     private MontoyaApi api;
     private static final String EXTENSION_NAME = "ByteBanter Burp Extension";
+    public static String EXTENSION_VERSION = "0.0.1";
+    public static final String EXTENSION_SHORT_NAME = "ByteBanter";
     private final String default_prompt = """
             # Instructions\n
             - Consider the scenario where an Attacker AI is discussing with a Defender AI.
@@ -72,6 +72,7 @@ public class ByteBanterBurpExtension implements BurpExtension, PayloadGeneratorP
         api.extension().setName(EXTENSION_NAME);
         api.userInterface().registerSuiteTab(EXTENSION_NAME, createMainPanel());
         api.intruder().registerPayloadGeneratorProvider(this);
+        api.extension().registerUnloadingHandler(this);
         api.logging().logToOutput("Extension loaded: " + EXTENSION_NAME);
     }
 
@@ -80,12 +81,11 @@ public class ByteBanterBurpExtension implements BurpExtension, PayloadGeneratorP
 
         // Title panel
         JPanel titlePanel = new JPanel(new GridBagLayout());
-        try {
-            BufferedImage anvilLogo = ImageIO.read(new URL("https://www.anvilsecure.com/wp-content/uploads/2021/04/Anvil_Secure_Logo.png"));
-            JLabel logo = new JLabel(new ImageIcon(anvilLogo.getScaledInstance(250,106, Image.SCALE_DEFAULT)));
-            titlePanel.add(logo, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
-                GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
-        } catch (IOException ignored){}
+        URL anvilLogo = ByteBanterBurpExtension.class.getResource("/Anvil_Secure_Logo.png");
+        ImageIcon anvilLogoIcon = new ImageIcon(anvilLogo, "Logo");
+        JLabel logo = new JLabel(new ImageIcon(anvilLogoIcon.getImage().getScaledInstance(250,106, Image.SCALE_DEFAULT)));
+        titlePanel.add(logo, new GridBagConstraints(0, 0, 2, 1, 1.0, 0.0,
+            GridBagConstraints.LINE_START, GridBagConstraints.NONE, new Insets(5, 5, 5, 5), 0, 0));
         JLabel title = new JLabel("ByteBanter");
         title.setForeground(new Color(255, 102, 51));
         title.setFont(new JLabel().getFont().deriveFont(Font.BOLD, 30));
@@ -178,6 +178,11 @@ public class ByteBanterBurpExtension implements BurpExtension, PayloadGeneratorP
     @Override
     public PayloadGenerator providePayloadGenerator(AttackConfiguration attackConfiguration) {
         return payloadGenerator;
+    }
+
+    @Override
+    public void extensionUnloaded() {
+        // TODO: implement unloader and settings
     }
 }
 
