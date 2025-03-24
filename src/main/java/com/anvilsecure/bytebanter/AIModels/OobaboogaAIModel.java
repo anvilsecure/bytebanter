@@ -1,31 +1,17 @@
 package com.anvilsecure.bytebanter.AIModels;
 
 import burp.api.montoya.MontoyaApi;
-import burp.api.montoya.http.handler.HttpRequestToBeSent;
-import burp.api.montoya.http.handler.HttpResponseReceived;
-import burp.api.montoya.http.handler.RequestToBeSentAction;
-import burp.api.montoya.http.handler.ResponseReceivedAction;
 import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
 import com.anvilsecure.bytebanter.AIModelUIs.OobaboogaAIModelUI;
 import org.json.*;
-import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
-import java.util.Base64;
 import java.util.Random;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class OobaboogaAIModel extends AIModel {
-    private static final String DEFAULT_MESSAGE = "Generate a new payload";
-    private final OobaboogaAIModelUI UI;
-    private JSONArray messages;
-    private Boolean isStateful = false;
 
     public OobaboogaAIModel(MontoyaApi api) {
         super(api, "Oobabooga");
-        UI = new OobaboogaAIModelUI();
-        messages = new JSONArray();
+        super.UI = new OobaboogaAIModelUI(this);
+        super.messages = new JSONArray();
     }
 
     private String sendRequestToAI(JSONObject data, JSONObject params) {
@@ -36,12 +22,8 @@ public class OobaboogaAIModel extends AIModel {
         data.put("top_p", params.getDouble("top_p"));
         data.put("stream", false);
         data.put("seed", new Random().nextInt() % 10000);
-
         JSONObject response = super.sendPostRequest(params.get("URL") + "chat/completions", data.toString(), params.getString("headers"));
-        String responseMessage = response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-
-
-        return responseMessage;
+        return response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
     }
 
     @Override
@@ -82,27 +64,5 @@ public class OobaboogaAIModel extends AIModel {
     @Override
     public AIModelUI getUI(){
         return UI;
-    }
-
-    @Override
-    public RequestToBeSentAction handleHttpRequestToBeSent(HttpRequestToBeSent httpRequestToBeSent) {
-        return RequestToBeSentAction.continueWith(httpRequestToBeSent);
-    }
-
-    @Override
-    public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived httpResponseReceived) {
-        JSONObject params = UI.getParams();
-        if (isStateful) {
-            Matcher matcher = Pattern.compile(params.getString("regex")).matcher(httpResponseReceived.bodyToString());
-            if (matcher.find()) {
-                String rxp = params.getBoolean("b64") ?
-                        Arrays.toString(Base64.getDecoder().decode(matcher.group(1))) : matcher.group(1);
-                api.logging().logToOutput("------------------------********** Target Response: **********-------------");
-                api.logging().logToOutput(rxp);
-                api.logging().logToOutput("-----------------------------------------------------------------------");
-                messages.put(new JSONObject().put("role", "user").put("content", rxp));
-            }
-        }
-        return ResponseReceivedAction.continueWith(httpResponseReceived);
     }
 }

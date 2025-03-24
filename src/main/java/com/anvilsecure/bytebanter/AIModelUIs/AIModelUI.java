@@ -1,5 +1,6 @@
 package com.anvilsecure.bytebanter.AIModelUIs;
 
+import com.anvilsecure.bytebanter.AIModels.AIModel;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -14,6 +15,11 @@ public abstract class AIModelUI {
     private JTextField regexField;
     private JCheckBox b64Check;
     private JTextArea promptField;
+    protected AIModel model;
+
+    public AIModelUI(AIModel model) {
+        this.model = model;
+    }
 
     public JPanel getPromptPanel(String default_prompt){
         JPanel promptPanel = new JPanel(new GridBagLayout());

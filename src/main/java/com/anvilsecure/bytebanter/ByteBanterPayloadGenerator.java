@@ -7,17 +7,14 @@ import burp.api.montoya.intruder.PayloadGenerator;
 import com.anvilsecure.bytebanter.AIModels.AIModel;
 import com.anvilsecure.bytebanter.AIModels.OobaboogaAIModel;
 
-import java.io.IOException;
 
 public class ByteBanterPayloadGenerator implements PayloadGenerator {
 
     private final AIModel[] models;
     private AIModel model;
-    private final MontoyaApi api;
 
     public ByteBanterPayloadGenerator(MontoyaApi api) {
         models = new AIModel[]{new OobaboogaAIModel(api)};
-        this.api = api;
         //Stateful models need to be registered as handlers
         api.http().registerHttpHandler(models[0]);
     }

@@ -1,5 +1,6 @@
 package com.anvilsecure.bytebanter.AIModelUIs;
 
+import com.anvilsecure.bytebanter.AIModels.AIModel;
 import org.json.JSONObject;
 
 import javax.swing.*;
@@ -15,6 +16,10 @@ public class OobaboogaAIModelUI extends AIModelUI {
     private JSlider topPSlider;
     private JSlider frequencyPenaltySlider;
     private JSlider presencePenaltySlider;
+
+    public OobaboogaAIModelUI(AIModel model) {
+        super(model);
+    }
 
     @Override
     public JPanel getURLPanel() {
