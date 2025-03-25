@@ -5,6 +5,8 @@ import com.anvilsecure.bytebanter.AIEngineUIs.OllamaAIEngineUI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.util.Random;
+
 public class OllamaAIEngine extends AIEngine {
     private static final String THINK_REGEX = "<think>(\n.*)*</think>";
 
@@ -16,11 +18,10 @@ public class OllamaAIEngine extends AIEngine {
 
     @Override
     protected JSONObject packData(JSONObject data, JSONObject params){
-        JSONObject oldData = super.packData(data, params);
         JSONObject options = new JSONObject();
         options.put("temperature", params.getInt("temperature"));
         options.put("top_p", params.getInt("top_p"));
-        options.put("seed", oldData.getInt("seed"));
+        data.put("seed", new Random().nextInt() % 10000);
         data.put("options", options);
         data.put("stream", false);
         data.put("model", params.getString("model"));
