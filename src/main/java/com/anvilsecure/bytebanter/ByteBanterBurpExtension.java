@@ -128,6 +128,15 @@ public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadin
         // Prompt panel
         promptPanel = payloadGenerator.getEngine().getUI().getPromptPanel(default_prompt);
         // Optimize button is stadard in all the engine
+        addOptimizeButton();
+        mainPanel.add(configPanel);
+        drawPanels();
+        panel.add(titlePanel, BorderLayout.NORTH);
+        panel.add(new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
+        return panel;
+    }
+
+    private void addOptimizeButton(){
         JButton optimizeButton = new JButton("Optimize!");
         URL sparklerURL = AIEngineUI.class.getResource("/sparkler.png");
         Image sparkler = new ImageIcon(sparklerURL).getImage().getScaledInstance(20,20,Image.SCALE_SMOOTH);
@@ -136,11 +145,6 @@ public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadin
         promptPanel.add(optimizeButton, new GridBagConstraints(0, 1, 1, 1, 1.0,
                 1.0, GridBagConstraints.CENTER, GridBagConstraints.NONE,
                 new Insets(0, 0, 0, 0), 0, 0));
-        mainPanel.add(configPanel);
-        drawPanels();
-        panel.add(titlePanel, BorderLayout.NORTH);
-        panel.add(new JScrollPane(mainPanel, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED), BorderLayout.CENTER);
-        return panel;
     }
 
     private void setPayloadGenerator(){
@@ -149,16 +153,19 @@ public class ByteBanterBurpExtension implements BurpExtension, ExtensionUnloadin
         configPanel.remove(URLPanel);
         configPanel.remove(paramPanel);
         configPanel.remove(statePanel);
-        configPanel.remove(promptPanel);
+        mainPanel.remove(promptPanel);
         URLPanel = UI.getURLPanel();
         paramPanel = UI.getParamPanel();
         statePanel = UI.getStatePanel();
         promptPanel = UI.getPromptPanel(default_prompt);
+        addOptimizeButton();
 
         drawPanels();
 
         configPanel.revalidate();
         configPanel.repaint();
+        mainPanel.revalidate();
+        mainPanel.repaint();
     }
 
     private void drawPanels(){

@@ -5,6 +5,7 @@ import burp.api.montoya.intruder.GeneratedPayload;
 import burp.api.montoya.intruder.IntruderInsertionPoint;
 import burp.api.montoya.intruder.PayloadGenerator;
 import com.anvilsecure.bytebanter.AIEngines.AIEngine;
+import com.anvilsecure.bytebanter.AIEngines.OllamaAIEngine;
 import com.anvilsecure.bytebanter.AIEngines.OobaboogaAIEngine;
 
 
@@ -14,7 +15,7 @@ public class ByteBanterPayloadGenerator implements PayloadGenerator {
     private AIEngine engine;
 
     public ByteBanterPayloadGenerator(MontoyaApi api) {
-        engines = new AIEngine[]{new OobaboogaAIEngine(api)};
+        engines = new AIEngine[]{new OobaboogaAIEngine(api), new OllamaAIEngine(api)};
         //Stateful engines need to be registered as handlers
         api.http().registerHttpHandler(engines[0]);
     }

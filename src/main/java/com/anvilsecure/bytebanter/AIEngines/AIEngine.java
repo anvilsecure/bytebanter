@@ -28,7 +28,6 @@ public abstract class AIEngine implements HttpHandler {
         this.name = name;
     }
 
-    abstract public String askAi(String prompt, String user_input);
     public AIEngineUI getUI(){
         return UI;
     };
@@ -37,9 +36,13 @@ public abstract class AIEngine implements HttpHandler {
          return name;
      };
 
-        public String askAi() {
+     public MontoyaApi getApi(){
+         return api;
+     }
+
+     public String askAi() {
         JSONObject params = UI.getParams();
-        JSONObject data = new JSONObject();
+        JSONObject data = packData(new JSONObject(), params);
 
         // reset messages on "stateful" change
         messages = isStateful != params.getBoolean("stateful") ? new JSONArray() : messages;
@@ -52,13 +55,27 @@ public abstract class AIEngine implements HttpHandler {
         if(!isStateful) {
             messages.put(new JSONObject().put("role", "user").put("content", DEFAULT_MESSAGE));
         }
+        data.remove("messages");
         data.put("messages", messages);
         String responseMessage = sendRequestToAI(data, params);
         messages.put(new JSONObject().put("role", "assistant").put("content", responseMessage));
         return responseMessage;
     }
 
-     protected String sendRequestToAI(JSONObject data, JSONObject params) {
+    // used for other interaction with the AI (i.e.: prompt optimization)
+    public String askAi(String prompt, String user_input) {
+        JSONObject params = UI.getParams();
+        JSONObject data = packData(new JSONObject(), params);;
+        JSONArray m = new JSONArray();
+        m.put(new JSONObject().put("role", "system").put("content", prompt));
+        m.put(new JSONObject().put("role", "user").put("content", user_input));
+        data.remove("messages");
+        data.put("messages", m);
+
+        return sendRequestToAI(data, params);
+    }
+
+     protected JSONObject packData(JSONObject data, JSONObject params) {
         data.put("frequency_penalty", params.getDouble("frequency_penalty"));
         data.put("max_tokens", params.getInt("max_tokens"));
         data.put("presence_penalty", params.getDouble("presence_penalty"));
@@ -66,9 +83,14 @@ public abstract class AIEngine implements HttpHandler {
         data.put("top_p", params.getDouble("top_p"));
         data.put("stream", false);
         data.put("seed", new Random().nextInt() % 10000);
+
+        return data;
+     }
+
+     protected String sendRequestToAI(JSONObject data, JSONObject params) {
         JSONObject response = sendPostRequest(params.get("URL") + "chat/completions", data.toString(), params.getString("headers"));
         return response.getJSONArray("choices").getJSONObject(0).getJSONObject("message").getString("content");
-    }
+     }
 
      JSONObject sendPostRequest(String urlString, String payload, String headers) {
         HttpRequest request = HttpRequest.httpRequestFromUrl(urlString);
