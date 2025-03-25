@@ -1,22 +1,22 @@
-package com.anvilsecure.bytebanter.AIModels;
+package com.anvilsecure.bytebanter.AIEngines;
 
 import burp.api.montoya.MontoyaApi;
-import com.anvilsecure.bytebanter.AIModelUIs.OllamaAIModelUI;
+import com.anvilsecure.bytebanter.AIEngineUIs.OllamaAIEngineUI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Random;
 
-public class OllamaAIModel extends AIModel{
+public class OllamaAIEngine extends AIEngine {
     private static final String DEFAULT_MESSAGE = "Generate a new payload";
-    private final OllamaAIModelUI UI;
+    private final OllamaAIEngineUI UI;
     private JSONArray messages;
     private Boolean isStateful = false;
 
 
-    public OllamaAIModel(MontoyaApi api) {
+    public OllamaAIEngine(MontoyaApi api) {
         super(api, "Ollama");
-        UI = new OllamaAIModelUI(this);
+        UI = new OllamaAIEngineUI(this);
         messages = new JSONArray();
     }
 

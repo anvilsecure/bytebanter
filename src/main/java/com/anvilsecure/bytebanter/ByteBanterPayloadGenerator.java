@@ -4,39 +4,39 @@ import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.intruder.GeneratedPayload;
 import burp.api.montoya.intruder.IntruderInsertionPoint;
 import burp.api.montoya.intruder.PayloadGenerator;
-import com.anvilsecure.bytebanter.AIModels.AIModel;
-import com.anvilsecure.bytebanter.AIModels.OobaboogaAIModel;
+import com.anvilsecure.bytebanter.AIEngines.AIEngine;
+import com.anvilsecure.bytebanter.AIEngines.OobaboogaAIEngine;
 
 
 public class ByteBanterPayloadGenerator implements PayloadGenerator {
 
-    private final AIModel[] models;
-    private AIModel model;
+    private final AIEngine[] engines;
+    private AIEngine engine;
 
     public ByteBanterPayloadGenerator(MontoyaApi api) {
-        models = new AIModel[]{new OobaboogaAIModel(api)};
-        //Stateful models need to be registered as handlers
-        api.http().registerHttpHandler(models[0]);
+        engines = new AIEngine[]{new OobaboogaAIEngine(api)};
+        //Stateful engines need to be registered as handlers
+        api.http().registerHttpHandler(engines[0]);
     }
 
-    public void setModel(int index){
-        model = models[index];
+    public void setEngine(int index){
+        engine = engines[index];
     }
 
-    public AIModel getModel(){
-        return model;
+    public AIEngine getEngine(){
+        return engine;
     }
 
-    public String[] getModelNames(){
-        String[] names = new String[models.length];
-        for (int i = 0; i < models.length; i++) {
-            names[i] = models[i].getName();
+    public String[] getEnginesNames(){
+        String[] names = new String[engines.length];
+        for (int i = 0; i < engines.length; i++) {
+            names[i] = engines[i].getName();
         }
         return names;
     }
 
     @Override
     public GeneratedPayload generatePayloadFor(IntruderInsertionPoint intruderInsertionPoint) {
-            return GeneratedPayload.payload(model.askAi());
+            return GeneratedPayload.payload(engine.askAi());
     }
 }

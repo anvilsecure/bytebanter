@@ -1,38 +1,35 @@
-package com.anvilsecure.bytebanter.AIModels;
+package com.anvilsecure.bytebanter.AIEngines;
 
 import burp.api.montoya.MontoyaApi;
 import burp.api.montoya.http.handler.*;
 import burp.api.montoya.http.message.HttpHeader;
 import burp.api.montoya.http.message.HttpRequestResponse;
 import burp.api.montoya.http.message.requests.HttpRequest;
-import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
-import com.anvilsecure.bytebanter.AIModelUIs.OobaboogaAIModelUI;
+import com.anvilsecure.bytebanter.AIEngineUIs.AIEngineUI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.Random;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public abstract class AIModel implements HttpHandler {
+public abstract class AIEngine implements HttpHandler {
     protected final String name ;
     protected final MontoyaApi api;
     protected static final String DEFAULT_MESSAGE = "Generate a new payload";
-    protected AIModelUI UI;
+    protected AIEngineUI UI;
     protected JSONArray messages;
     protected Boolean isStateful = false;
 
-    protected AIModel(MontoyaApi api, String name) {
+    protected AIEngine(MontoyaApi api, String name) {
         this.api = api;
         this.name = name;
     }
 
     abstract public String askAi(String prompt, String user_input);
-    public AIModelUI getUI(){
+    public AIEngineUI getUI(){
         return UI;
     };
 

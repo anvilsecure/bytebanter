@@ -1,16 +1,14 @@
-package com.anvilsecure.bytebanter.AIModels;
+package com.anvilsecure.bytebanter.AIEngines;
 
 import burp.api.montoya.MontoyaApi;
-import com.anvilsecure.bytebanter.AIModelUIs.AIModelUI;
-import com.anvilsecure.bytebanter.AIModelUIs.OobaboogaAIModelUI;
+import com.anvilsecure.bytebanter.AIEngineUIs.OobaboogaAIEngineUI;
 import org.json.*;
-import java.util.Random;
 
-public class OobaboogaAIModel extends AIModel {
+public class OobaboogaAIEngine extends AIEngine {
 
-    public OobaboogaAIModel(MontoyaApi api) {
+    public OobaboogaAIEngine(MontoyaApi api) {
         super(api, "Oobabooga");
-        super.UI = new OobaboogaAIModelUI(this);
+        super.UI = new OobaboogaAIEngineUI(this);
         super.messages = new JSONArray();
     }
 

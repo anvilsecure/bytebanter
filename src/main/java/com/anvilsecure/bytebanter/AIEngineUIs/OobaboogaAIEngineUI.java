@@ -1,13 +1,13 @@
-package com.anvilsecure.bytebanter.AIModelUIs;
+package com.anvilsecure.bytebanter.AIEngineUIs;
 
-import com.anvilsecure.bytebanter.AIModels.AIModel;
+import com.anvilsecure.bytebanter.AIEngines.AIEngine;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
 
-public class OobaboogaAIModelUI extends AIModelUI {
+public class OobaboogaAIEngineUI extends AIEngineUI {
     private JTextField urlField;
     private JTextArea headersField;
 
@@ -17,14 +17,14 @@ public class OobaboogaAIModelUI extends AIModelUI {
     private JSlider frequencyPenaltySlider;
     private JSlider presencePenaltySlider;
 
-    public OobaboogaAIModelUI(AIModel model) {
-        super(model);
+    public OobaboogaAIEngineUI(AIEngine engine) {
+        super(engine);
     }
 
     @Override
     public JPanel getURLPanel() {
         JPanel configPanel = new JPanel(new GridBagLayout());
-        configPanel.setBorder(new TitledBorder("Model URL:"));
+        configPanel.setBorder(new TitledBorder("Engine URL:"));
         urlField = new JTextField("http://anvil-ai:1337/v1/", 40);
         urlField.setBorder(new TitledBorder("URL:"));
         configPanel.add(urlField, new GridBagConstraints(0, 0, 2, 1, 0.001, 0.001,

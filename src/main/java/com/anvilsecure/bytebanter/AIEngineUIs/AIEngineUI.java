@@ -1,23 +1,20 @@
-package com.anvilsecure.bytebanter.AIModelUIs;
+package com.anvilsecure.bytebanter.AIEngineUIs;
 
-import com.anvilsecure.bytebanter.AIModels.AIModel;
+import com.anvilsecure.bytebanter.AIEngines.AIEngine;
 import org.json.JSONObject;
 
 import javax.swing.*;
 import javax.swing.border.TitledBorder;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.net.URL;
 
-public abstract class AIModelUI {
+public abstract class AIEngineUI {
     private JCheckBox statefulCheck;
     private JTextField regexField;
     private JCheckBox b64Check;
     private JTextArea promptField;
-    protected AIModel model;
+    protected AIEngine model;
 
-    public AIModelUI(AIModel model) {
+    public AIEngineUI(AIEngine model) {
         this.model = model;
     }
 
