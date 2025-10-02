@@ -5,9 +5,12 @@
 * **LLM-Driven Payload Generation:** Utilizes LLMs to create dynamic payloads based on user-defined prompts and contexts.
 * **Seamless Burp Integration:** Registers as a custom payload generator within Burp Intruder, allowing easy selection and use.
 * **Configurable Prompts:** Users can define and customize prompts to guide the LLM in generating desired payloads.
-* **Support for Multiple LLM Providers:** Compatible with various LLM APIs: BurpAI, OpenAI, and Oobabooga (more to come).
+
+This version of ByteBanter is meant to comply with BurpSuite BApp store standards, hence it supports interaction only with BurpAI engine. You can find on the main branch the version with capabilities to interact with other LLM engines. 
 
 ## Installation
+You can find this version of ByteBanter in the official BurpSuite BApp store. But If you prefer you can compile the code by yourself according to the following instructions.
+
 * Clone the Repository:
 
 ```bash
@@ -60,12 +63,10 @@ automatically saved and used by the generator and Burp also persists them.
 * Burp Suite (Community or Professional Edition)
 
 ### Contributing
-Contributions are welcome! To integrate a new LLM engine you'll need to write its own AIEngine (control) Class and AIEngineUI (view)
-And register it in the `ByteBanterPayloadsGenator` engines list.
+Contributions are welcome!
 
 ## License
 This project is licensed under the [MIT License](https://opensource.org/license/mit).
 
 ## Acknowledgments
 * [PortSwigger](https://portswigger.net/) for Burp Suite and its extensibility.
-* [OpenAI](https://openai.com/) and [Oobabooga](https://github.com/oobabooga) for providing powerful LLM APIs.
