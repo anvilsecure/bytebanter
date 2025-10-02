@@ -14,7 +14,7 @@ You can find this version of ByteBanter in the official BurpSuite BApp store. Bu
 * Clone the Repository:
 
 ```bash
-git clone https://github.com/anvilventures/bytebanter/
+git clone https://github.com/anvilsecure/bytebanter/
 ```
 * Build the Extension: Navigate to the project directory and build the JAR file using your preferred build tool (e.g., Maven or Gradle).
 
