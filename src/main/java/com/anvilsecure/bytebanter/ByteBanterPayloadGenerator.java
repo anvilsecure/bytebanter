@@ -6,8 +6,6 @@ import burp.api.montoya.intruder.IntruderInsertionPoint;
 import burp.api.montoya.intruder.PayloadGenerator;
 import com.anvilsecure.bytebanter.AIEngines.AIEngine;
 import com.anvilsecure.bytebanter.AIEngines.BurpAIEngine;
-import com.anvilsecure.bytebanter.AIEngines.OllamaAIEngine;
-import com.anvilsecure.bytebanter.AIEngines.OobaboogaAIEngine;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -20,8 +18,6 @@ public class ByteBanterPayloadGenerator implements PayloadGenerator {
 
     public ByteBanterPayloadGenerator(MontoyaApi api) {
         engines = new ArrayList<>();
-        engines.add(new OobaboogaAIEngine(api));
-        engines.add(new OllamaAIEngine(api));
         if(api.ai().isEnabled()){
             engines.add(new BurpAIEngine(api));
         }
