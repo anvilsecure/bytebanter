@@ -11,10 +11,11 @@ This version of ByteBanter is meant to comply with BurpSuite BApp store standard
 ## Installation
 You can find this version of ByteBanter in the official BurpSuite BApp store. But If you prefer you can compile the code by yourself according to the following instructions.
 
-* Clone the Repository:
+* Clone the Repository and checkout `bapp` branch:
 
 ```bash
 git clone https://github.com/anvilsecure/bytebanter/
+git checkout bapp
 ```
 * Build the Extension: Navigate to the project directory and build the JAR file using your preferred build tool (e.g., Maven or Gradle).
 
