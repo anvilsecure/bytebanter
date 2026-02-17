@@ -16,31 +16,31 @@ import java.awt.*;
 public class OllamaAIEngineUI extends AIEngineUI {
     private JComboBox<String> modelCombo;
     private final DocumentListener documentListener = new DocumentListener() {
-            @Override
-            public void insertUpdate(DocumentEvent e) {
-                new Thread(() -> loadModels(e)).start();
-            }
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            new Thread(() -> loadModels(e)).start();
+        }
 
-            @Override
-            public void removeUpdate(DocumentEvent e) {
-                new Thread(() -> loadModels(e)).start();
-            }
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            new Thread(() -> loadModels(e)).start();
+        }
 
-            @Override
-            public void changedUpdate(DocumentEvent e) {
-                new Thread(() -> loadModels(e)).start();
-            }
-        };
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            new Thread(() -> loadModels(e)).start();
+        }
+    };
 
     public OllamaAIEngineUI(AIEngine engine) {
         super(engine);
     }
 
     @Override
-    public JPanel getURLPanel() {
-        JPanel urlPanel = super.getURLPanel();
+    public JPanel getAIConfPanel() {
+        JPanel urlPanel = super.getAIConfPanel();
         urlField.setText("http://localhost:11434/");
-        modelCombo = new JComboBox<>(new String[]{"Set the URL to Ollama"});
+        modelCombo = new JComboBox<>(new String[] { "Set the URL to Ollama" });
         urlPanel.add(modelCombo);
         urlField.getDocument().addDocumentListener(documentListener);
         headersField.getDocument().addDocumentListener(documentListener);
@@ -50,17 +50,30 @@ public class OllamaAIEngineUI extends AIEngineUI {
     @Override
     public JPanel getParamPanel() {
         JPanel paramPanel = new JPanel(new GridLayout(6, 1));
-        temperatureSlider = new JSlider(1,500, 70);
-        topPSlider = new JSlider(0,10, 0);
-        paramPanel.add(new JLabel("Temperature:"));
-        paramPanel.add(temperatureSlider);
-        paramPanel.add(new JLabel("Top P:"));
-        paramPanel.add(topPSlider);
+        temperatureSlider = new JSlider(1, 500, 70);
+        topPSlider = new JSlider(0, 10, 0);
+
+        JLabel tempLabel = new JLabel("Temperature: " + String.format("%.2f", temperatureSlider.getValue() / 100.0));
+        temperatureSlider.addChangeListener(
+                e -> tempLabel.setText("Temperature: " + String.format("%.2f", temperatureSlider.getValue() / 100.0)));
+        JPanel tempPanel = new JPanel(new BorderLayout());
+        tempPanel.add(tempLabel, BorderLayout.NORTH);
+        tempPanel.add(temperatureSlider, BorderLayout.CENTER);
+        paramPanel.add(tempPanel);
+
+        JLabel topPLabel = new JLabel("Top P: " + String.format("%.2f", topPSlider.getValue() / 20.0));
+        topPSlider.addChangeListener(
+                e -> topPLabel.setText("Top P: " + String.format("%.2f", topPSlider.getValue() / 20.0)));
+        JPanel topPPanel = new JPanel(new BorderLayout());
+        topPPanel.add(topPLabel, BorderLayout.NORTH);
+        topPPanel.add(topPSlider, BorderLayout.CENTER);
+        paramPanel.add(topPPanel);
+
         return paramPanel;
     }
 
     @Override
-    public JSONObject getParams(){
+    public JSONObject getParams() {
         JSONObject params = super.getParams();
         params.put("model", modelCombo.getSelectedItem());
         return params;
@@ -73,7 +86,7 @@ public class OllamaAIEngineUI extends AIEngineUI {
     }
 
     private void loadModels(DocumentEvent e) {
-        String url = urlField.getText()+"api/tags";
+        String url = urlField.getText() + "api/tags";
         String headers = headersField.getText();
         MontoyaApi api = this.model.getApi();
         HttpRequestResponse response;

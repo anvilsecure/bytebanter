@@ -11,6 +11,7 @@ import com.anvilsecure.bytebanter.AIEngineUIs.BurpAIEngineUI;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import javax.swing.JOptionPane;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.regex.Matcher;
@@ -24,38 +25,71 @@ public class BurpAIEngine extends AIEngine {
         super.messages = new JSONArray();
     }
 
+    private boolean isAIEnabled() {
+        if (!api.ai().isEnabled()) {
+            JOptionPane.showMessageDialog(null,
+                    "ByteBanter: Unable to generate payloads or optimize prompts because BurpAI is disabled!"
+                            + "\nOr you have finished your tokens!",
+                    "ByteBanter Error", JOptionPane.ERROR_MESSAGE);
+            return false;
+        }
+        return true;
+    }
+
     @Override
     public String askAi() {
+        if (!isAIEnabled()) {
+            return null;
+        }
         JSONObject params = UI.getParams();
         JSONObject data = packData(new JSONObject(), params);
 
-
-        // reset messages on "stateful" change
-        messages = isStateful != params.getBoolean("stateful") ? new JSONArray() : messages;
-        isStateful = params.getBoolean("stateful");
-
-        if(messages.isEmpty()) {
-            messages.put(Message.systemMessage(params.getString("prompt")));
+        isInfiniteRequests = data.getBoolean("isInfiniteRequests");
+        // reset counter if attack length changes
+        if (oldInfiniteFlag != isInfiniteRequests || this.requestsLimit != data.getInt("requestsLimit")) {
+            counter = 0;
         }
+        oldInfiniteFlag = isInfiniteRequests;
+        this.requestsLimit = data.getInt("requestsLimit");
 
-        if(!isStateful) {
-            messages.put(Message.userMessage(DEFAULT_MESSAGE));
+        // check if the number of maximum requests has been reached
+        if (isInfiniteRequests || counter < this.requestsLimit) {
+            counter++;
+
+            // reset messages on "stateful" change
+            messages = isStateful != params.getBoolean("stateful") ? new JSONArray() : messages;
+            isStateful = params.getBoolean("stateful");
+
+            if (messages.isEmpty()) {
+                messages.put(Message.systemMessage(params.getString("prompt")));
+            }
+
+            if (!isStateful) {
+                messages.put(Message.userMessage(DEFAULT_MESSAGE));
+            }
+            data.remove("messages");
+            data.put("messages", messages);
+            String responseMessage = sendRequestToAI(data, params);
+            api.logging().logToOutput("--------------******* AI Payload: *******-----------------");
+            api.logging().logToOutput(responseMessage);
+            api.logging().logToOutput("----------------------------------------------------------");
+            messages.put(Message.assistantMessage(responseMessage));
+            return responseMessage;
+        } else {
+            counter = 0;
+            return null;
         }
-        data.remove("messages");
-        data.put("messages", messages);
-        String responseMessage = sendRequestToAI(data, params);
-        api.logging().logToOutput("--------------******* AI Payload: *******-----------------");
-        api.logging().logToOutput(responseMessage);
-        api.logging().logToOutput("----------------------------------------------------------");
-        messages.put(Message.assistantMessage(responseMessage));
-        return responseMessage;
     }
 
     // used for other interaction with the AI (i.e.: prompt optimization)
     @Override
     public String askAi(String prompt, String user_input) {
+        if (!isAIEnabled()) {
+            return prompt;
+        }
         JSONObject params = UI.getParams();
-        JSONObject data = packData(new JSONObject(), params);;
+        JSONObject data = packData(new JSONObject(), params);
+        ;
         JSONArray m = new JSONArray();
         m.put(Message.systemMessage(prompt));
         m.put(Message.userMessage(user_input));
@@ -67,8 +101,10 @@ public class BurpAIEngine extends AIEngine {
 
     @Override
     protected JSONObject packData(JSONObject data, JSONObject params) {
-        data.put("temperature", params.getDouble("temperature")/100);
-        api.logging().logToOutput("Model Config: "+ data.toString());
+        data.put("temperature", params.getDouble("temperature") / 100);
+        data.put("isInfiniteRequests", params.getBoolean("isInfiniteRequests"));
+        data.put("requestsLimit", params.getInt("requestsLimit"));
+        api.logging().logToOutput("Model Config: " + data.toString());
         return data;
     }
 
@@ -88,23 +124,24 @@ public class BurpAIEngine extends AIEngine {
             // Execute Prompt
             PromptResponse response = api.ai().prompt().execute(options, context);
             return response.content();
-        }catch (PromptException e) {
-            api.logging().logToError("An error occurred while processing the prompt: " + e.getMessage());
-            api.logging().logToError("Unable to retrieve AI response. Please try again later. " +
-                    "(Mostly this error could be related to BurpAI disabled or AI credit exhausted)");
-            // Exception thrown anyway, to stop payload generation.
+        } catch (PromptException e) {
+            JOptionPane.showMessageDialog(null, "An error occurred while processing the prompt: " + e.getMessage() +
+                    "\nUnable to retrieve AI response. Please try again later. " +
+                    "\n(Mostly this error could be related to BurpAI disabled or AI credit exhausted)",
+                    "ByteBanter Error", JOptionPane.ERROR_MESSAGE);
+            // return null, to stop payload generation.
             throw new PromptException(e.getMessage());
         }
     }
 
-     @Override
+    @Override
     public ResponseReceivedAction handleHttpResponseReceived(HttpResponseReceived httpResponseReceived) {
         JSONObject params = UI.getParams();
         if (isStateful) {
             Matcher matcher = Pattern.compile(params.getString("regex")).matcher(httpResponseReceived.bodyToString());
             if (matcher.find()) {
-                String rxp = params.getBoolean("b64") ?
-                        Arrays.toString(Base64.getDecoder().decode(matcher.group(1))) : matcher.group(1);
+                String rxp = params.getBoolean("b64") ? Arrays.toString(Base64.getDecoder().decode(matcher.group(1)))
+                        : matcher.group(1);
                 api.logging().logToOutput("----------------********** Target Response: **********-----------------");
                 api.logging().logToOutput(rxp);
                 api.logging().logToOutput("-----------------------------------------------------------------------");
